@@ -1,0 +1,587 @@
+/* Nostalgic Gallery Color Integration - CSS Implementation */
+
+/* CSS Custom Properties - Nostalgic Color Palette */
+:root {
+  /* Nostalgic Primary Colors */
+  --sepia-memory: #F4F1E8;
+  --vintage-rose: #E8D5C4;
+  --aged-bronze: #CD853F;
+  --deep-charcoal: #36454F;
+  
+  /* Supporting Nostalgic Colors */
+  --cream-white: #FFFDD0;
+  --soft-taupe: #D2B48C;
+  --muted-gold: #CFB53B;
+  --warm-grey: #A8A8A8;
+  
+  /* Memorial Integration Colors */
+  --lavender-mist: #E6E6FA;
+  --lavender-dream: #D8BFD8;
+  --gentle-rose: #F5F5F5;
+  
+  /* Shadows and Effects */
+  --soft-shadow: rgba(54, 69, 79, 0.1);
+  --medium-shadow: rgba(54, 69, 79, 0.2);
+  --strong-shadow: rgba(54, 69, 79, 0.3);
+}
+
+/* Global Styles with Nostalgic Colors */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--deep-charcoal);
+  background: linear-gradient(135deg, 
+    var(--sepia-memory) 0%, 
+    var(--cream-white) 50%, 
+    var(--vintage-rose) 100%);
+  min-height: 100vh;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Typography with Nostalgic Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  color: var(--deep-charcoal);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 2.25rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.875rem;
+  font-weight: 600;
+}
+
+p {
+  color: var(--deep-charcoal);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.text-soft {
+  color: var(--warm-grey);
+}
+
+.text-accent {
+  color: var(--aged-bronze);
+}
+
+/* Navigation with Nostalgic Styling */
+nav {
+  background: rgba(255, 253, 208, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--soft-taupe);
+}
+
+.nav-link {
+  color: var(--deep-charcoal);
+  font-weight: 500;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--aged-bronze);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--aged-bronze);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Hero Section with Nostalgic Background */
+.hero-bg {
+  background: linear-gradient(
+    rgba(244, 241, 232, 0.9), 
+    rgba(255, 253, 208, 0.8)
+  ), url('resources/hero-memorial-garden.png') center/cover;
+  position: relative;
+}
+
+/* Memory Cards with Nostalgic Styling */
+.memory-card {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--soft-shadow);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.memory-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px var(--medium-shadow);
+  border-color: var(--aged-bronze);
+}
+
+/* Memory Type Cards */
+.memory-type-card {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.memory-type-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px var(--medium-shadow);
+  border-color: var(--aged-bronze);
+}
+
+.memory-type-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--aged-bronze);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.memory-type-card:hover .memory-type-icon {
+  transform: scale(1.1);
+  background: var(--muted-gold);
+}
+
+/* Buttons with Nostalgic Styling */
+.btn-primary {
+  background: var(--aged-bronze);
+  color: var(--cream-white);
+  border: 2px solid var(--muted-gold);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--muted-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(205, 133, 63, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--aged-bronze);
+  border: 2px solid var(--aged-bronze);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--aged-bronze);
+  color: var(--cream-white);
+  transform: translateY(-2px);
+}
+
+/* Story Cards with Nostalgic Styling */
+.story-card {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.story-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px var(--medium-shadow);
+  border-color: var(--aged-bronze);
+}
+
+.story-content {
+  max-height: 120px;
+  overflow: hidden;
+  position: relative;
+  color: var(--deep-charcoal);
+  line-height: 1.6;
+}
+
+.story-content.expanded {
+  max-height: none;
+}
+
+.story-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, var(--cream-white));
+  pointer-events: none;
+}
+
+.story-content.expanded::after {
+  display: none;
+}
+
+/* Photo Gallery with Nostalgic Styling */
+.photo-card {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.photo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px var(--medium-shadow);
+  border-color: var(--aged-bronze);
+}
+
+/* Audio Player with Nostalgic Styling */
+.audio-player {
+  background: linear-gradient(135deg, 
+    var(--sepia-memory) 0%, 
+    var(--cream-white) 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid var(--soft-taupe);
+}
+
+.play-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--aged-bronze);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.play-button:hover {
+  background: var(--muted-gold);
+  transform: scale(1.05);
+}
+
+.play-button.playing {
+  background: var(--deep-charcoal);
+}
+
+.waveform {
+  height: 60px;
+  background: linear-gradient(90deg, 
+    var(--aged-bronze) 0%, 
+    var(--vintage-rose) 50%, 
+    var(--aged-bronze) 100%);
+  border-radius: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.waveform::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 35%;
+  background: linear-gradient(90deg, 
+    var(--aged-bronze), 
+    var(--warm-grey));
+  border-radius: 30px;
+  animation: waveform 2s ease-in-out infinite;
+}
+
+@keyframes waveform {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.3); }
+}
+
+/* Media Cards with Nostalgic Styling */
+.media-card {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.media-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px var(--medium-shadow);
+  border-color: var(--aged-bronze);
+}
+
+/* Modal Styling */
+.modal-backdrop,
+.lightbox {
+  backdrop-filter: blur(8px);
+  background: rgba(54, 69, 79, 0.5);
+}
+
+.modal-content {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px var(--strong-shadow);
+}
+
+/* Lightbox Styling */
+.lightbox-content {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 16px;
+  max-height: 90vh;
+  max-width: 90vw;
+  overflow: hidden;
+}
+
+/* Form Elements with Nostalgic Styling */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="file"],
+textarea,
+select {
+  background: var(--cream-white);
+  border: 1px solid var(--soft-taupe);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--deep-charcoal);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--aged-bronze);
+  box-shadow: 0 0 0 3px rgba(205, 133, 63, 0.1);
+}
+
+/* Filter Buttons with Nostalgic Styling */
+.filter-button {
+  background: transparent;
+  color: var(--aged-bronze);
+  border: 1px solid var(--soft-taupe);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background: var(--vintage-rose);
+  border-color: var(--aged-bronze);
+}
+
+.filter-button.active {
+  background: var(--aged-bronze);
+  color: var(--cream-white);
+  border-color: var(--aged-bronze);
+}
+
+/* Tab Buttons with Nostalgic Styling */
+.tab-button {
+  background: transparent;
+  color: var(--aged-bronze);
+  border: none;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+  color: var(--muted-gold);
+  background: var(--vintage-rose);
+}
+
+.tab-button.active {
+  color: var(--aged-bronze);
+  border-bottom-color: var(--aged-bronze);
+  background: var(--vintage-rose);
+}
+
+/* Upload Area with Nostalgic Styling */
+.upload-area {
+  border: 2px dashed var(--soft-taupe);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: var(--cream-white);
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+  border-color: var(--aged-bronze);
+  background: var(--vintage-rose);
+}
+
+/* Recording Indicator */
+.recording-indicator {
+  width: 12px;
+  height: 12px;
+  background: #ff4444;
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Like Button with Nostalgic Styling */
+.like-button {
+  color: var(--warm-grey);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.like-button:hover {
+  color: var(--aged-bronze);
+  transform: scale(1.1);
+}
+
+.like-button.liked {
+  color: var(--aged-bronze);
+}
+
+/* Footer with Nostalgic Styling */
+footer {
+  background: var(--deep-charcoal);
+  color: var(--cream-white);
+  padding: 3rem 0;
+}
+
+footer h3 {
+  color: var(--cream-white);
+}
+
+footer p {
+  color: var(--warm-grey);
+}
+
+/* Scroll Animations */
+.recent-memory {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.recent-memory.visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.6s ease;
+}
+
+/* Nostalgic Image Filters */
+.nostalgic-image {
+  filter: sepia(10%) contrast(1.05) brightness(1.02);
+  transition: filter 0.3s ease;
+}
+
+.nostalgic-image:hover {
+  filter: sepia(5%) contrast(1.1) brightness(1.05);
+}
+
+/* Aged Paper Texture */
+.aged-paper {
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(54,69,79,0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --deep-charcoal: #2C3539; /* Darker for mobile */
+    --warm-grey: #909090;     /* Lighter for mobile */
+  }
+  
+  .memory-card,
+  .story-card,
+  .photo-card,
+  .media-card {
+    background: var(--cream-white);
+    border: 1px solid var(--soft-taupe);
+  }
+  
+  h1 {
+    font-size: 2.25rem;
+  }
+  
+  h2 {
+    font-size: 1.875rem;
+  }
+}
+
+/* Dark Mode Considerations */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sepia-memory: #2C2416;
+    --cream-white: #3A3A3A;
+    --deep-charcoal: #E8E8E8;
+    --warm-grey: #B8B8B8;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .memory-card,
+  .story-card,
+  .photo-card,
+  .media-card {
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media - Memories of Friends</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lavender-mist': '#E6E6FA',
+                        'lavender-dream': '#D8BFD8',
+                        'soft-grey': '#A9A9A9',
+                        'warm-grey': '#808080',
+                        'gentle-rose': '#F5F5F5'
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #E6E6FA 0%, #F5F5F5 100%);
+            min-height: 100vh;
+        }
+        
+        .media-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .media-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #D8BFD8;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .audio-player {
+            background: linear-gradient(135deg, #E6E6FA 0%, #F5F5F5 100%);
+        }
+        
+        .waveform {
+            height: 60px;
+            background: linear-gradient(90deg, #D8BFD8 0%, #E6E6FA 50%, #D8BFD8 100%);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .waveform::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 35%;
+            background: linear-gradient(90deg, #D8BFD8, #A9A9A9);
+            border-radius: 30px;
+            animation: waveform 2s ease-in-out infinite;
+        }
+        
+        @keyframes waveform {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.3); }
+        }
+        
+        .play-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #D8BFD8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .play-button:hover {
+            background: #A9A9A9;
+            transform: scale(1.05);
+        }
+        
+        .play-button.playing {
+            background: #808080;
+        }
+        
+        .recording-indicator {
+            width: 12px;
+            height: 12px;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background-color: #D8BFD8;
+            color: white;
+        }
+        
+        .upload-area {
+            border: 2px dashed #D8BFD8;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area.dragover {
+            border-color: #A9A9A9;
+            background-color: #F5F5F5;
+        }
+    </style>
+</head>
+<body class="font-inter text-warm-grey">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-lavender-mist">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-lavender-dream rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">M</span>
+                    </div>
+                    <h1 class="font-playfair text-xl font-semibold text-warm-grey">Memories of Friends</h1>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Home</a>
+                    <a href="stories.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Stories</a>
+                    <a href="gallery.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Gallery</a>
+                    <a href="media.html" class="nav-link active text-warm-grey hover:text-lavender-dream font-medium">Media</a>
+                </div>
+                
+                <button class="md:hidden p-2 rounded-lg hover:bg-lavender-mist">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-8">
+                <h1 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-4">
+                    Audio & Video Memories
+                </h1>
+                <p class="text-xl text-soft-grey max-w-3xl mx-auto leading-relaxed">
+                    Record voice messages, share video tributes, and preserve the precious sound and motion of remembered moments.
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="openUploadModal()" class="bg-lavender-dream text-white px-6 py-3 rounded-full font-medium hover:bg-lavender-mist transition-all duration-300 hover:shadow-lg">
+                    Share Media
+                </button>
+                <div class="flex items-center space-x-2">
+                    <span class="text-soft-grey">Type:</span>
+                    <select id="type-filter" class="border border-lavender-mist rounded-lg px-3 py-2 text-warm-grey bg-white">
+                        <option value="all">All Media</option>
+                        <option value="audio">Audio Only</option>
+                        <option value="video">Video Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Media Tabs -->
+    <section class="py-6 bg-gentle-rose">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="tab-button active px-6 py-3 rounded-full border border-lavender-mist font-medium" data-tab="all">
+                    All Media
+                </button>
+                <button class="tab-button px-6 py-3 rounded-full border border-lavender-mist font-medium" data-tab="audio">
+                    Voice Notes
+                </button>
+                <button class="tab-button px-6 py-3 rounded-full border border-lavender-mist font-medium" data-tab="video">
+                    Videos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Media Grid -->
+    <section class="py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Audio Card 1 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="audio">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/b1e33e4c55e8f45518e99c86157546ea2f3ae815.jpg" 
+                             alt="Emma L." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Emma L.</h3>
+                            <p class="text-sm text-soft-grey">2 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-4">Dad's Favorite Song</h4>
+                    
+                    <div class="audio-player rounded-lg p-4 mb-4">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="play-button" onclick="toggleAudioPlayback(this)">
+                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 5v10l7-5z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="waveform mb-2"></div>
+                                <div class="flex items-center justify-between text-sm text-soft-grey">
+                                    <span>2:15</span>
+                                    <span>4:32</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-lavender-dream" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                                <span class="text-sm text-soft-grey">Voice Recording</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-soft-grey" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        This recording of Dad singing his favorite song always brings tears to my eyes. He had such a beautiful voice.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">18</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">5</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Audio</span>
+                    </div>
+                </div>
+
+                <!-- Video Card 1 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="video">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="bg-gentle-rose rounded-lg overflow-hidden relative" style="padding-bottom: 56.25%;">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button class="w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center hover:bg-lavender-mist transition-colors" onclick="playVideo(this)">
+                                    <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8 5v10l7-5z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <div class="bg-black bg-opacity-50 text-white text-sm px-3 py-1 rounded-full inline-block">
+                                    3:45
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center mb-3">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/0609284a80c28f1c96dc40cd0383e3c1146f1455.jpg" 
+                             alt="Michael R." class="w-10 h-10 rounded-full object-cover mr-3">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Michael R.</h3>
+                            <p class="text-sm text-soft-grey">5 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-2">Wedding Anniversary Tribute</h4>
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        A beautiful video compilation of my parents' 50th wedding anniversary celebration.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">73</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">12</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Video</span>
+                    </div>
+                </div>
+
+                <!-- Audio Card 2 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="audio">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                             alt="Lisa K." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Lisa K.</h3>
+                            <p class="text-sm text-soft-grey">1 day ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-4">Grandmother's Recipe</h4>
+                    
+                    <div class="audio-player rounded-lg p-4 mb-4">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="play-button" onclick="toggleAudioPlayback(this)">
+                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 5v10l7-5z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="waveform mb-2"></div>
+                                <div class="flex items-center justify-between text-sm text-soft-grey">
+                                    <span>0:45</span>
+                                    <span>2:30</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-lavender-dream" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                                <span class="text-sm text-soft-grey">Voice Recording</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        Recording of my grandmother explaining how to make her famous apple pie. Her voice is so precious to me.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">34</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">8</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Audio</span>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="video">
+                    <div class="aspect-w-16 aspect-h-9 mb-4">
+                        <div class="bg-gentle-rose rounded-lg overflow-hidden relative" style="padding-bottom: 56.25%;">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button class="w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center hover:bg-lavender-mist transition-colors" onclick="playVideo(this)">
+                                    <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M8 5v10l7-5z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <div class="bg-black bg-opacity-50 text-white text-sm px-3 py-1 rounded-full inline-block">
+                                    5:12
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center mb-3">
+                        <img src="https://kimi-web-img.moonshot.cn/img/cdn.pixabay.com/ac0105d2729504c6c85067cac85714e479c89738.jpg" 
+                             alt="David K." class="w-10 h-10 rounded-full object-cover mr-3">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">David K.</h3>
+                            <p class="text-sm text-soft-grey">2 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-2">Family Christmas Memories</h4>
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        Compilation of our family Christmas celebrations over the years. So many precious moments captured.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">91</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">16</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Video</span>
+                    </div>
+                </div>
+
+                <!-- Audio Card 3 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="audio">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.fineartamerica.com/27cd8e03179b4ba4c89e7abe3dc1e87257ec8a58.jpg" 
+                             alt="Anna P." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Anna P.</h3>
+                            <p class="text-sm text-soft-grey">3 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-4">Childhood Lullaby</h4>
+                    
+                    <div class="audio-player rounded-lg p-4 mb-4">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="play-button" onclick="toggleAudioPlayback(this)">
+                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 5v10l7-5z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="waveform mb-2"></div>
+                                <div class="flex items-center justify-between text-sm text-soft-grey">
+                                    <span>1:20</span>
+                                    <span>3:15</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-lavender-dream" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                                <span class="text-sm text-soft-grey">Voice Recording</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        My mother used to sing this lullaby to me every night. Now I sing it to my own children.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">56</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">9</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Audio</span>
+                    </div>
+                </div>
+
+                <!-- Audio Card 4 -->
+                <div class="media-card bg-white rounded-2xl p-6 border border-lavender-mist" data-type="audio">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/1b67f40e0aca99bb05288d92b30400e130d83035.jpg" 
+                             alt="Maria S." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Maria S.</h3>
+                            <p class="text-sm text-soft-grey">4 days ago</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-playfair text-xl font-semibold text-warm-grey mb-4">Father's Day Message</h4>
+                    
+                    <div class="audio-player rounded-lg p-4 mb-4">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="play-button" onclick="toggleAudioPlayback(this)">
+                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 5v10l7-5z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="waveform mb-2"></div>
+                                <div class="flex items-center justify-between text-sm text-soft-grey">
+                                    <span>0:00</span>
+                                    <span>1:45</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-lavender-dream" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                                <span class="text-sm text-soft-grey">Voice Recording</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-soft-grey text-sm leading-relaxed mb-4">
+                        The last message my father left me before he passed. I listen to it when I miss him most.
+                    </p>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span class="text-sm">127</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">23</span>
+                            </button>
+                        </div>
+                        <span class="text-xs text-soft-grey bg-gentle-rose px-2 py-1 rounded-full">Audio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-lavender-mist">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-playfair text-2xl font-bold text-warm-grey">Share Media</h2>
+                    <button onclick="closeUploadModal()" class="text-soft-grey hover:text-warm-grey">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <!-- Media Type Tabs -->
+                <div class="flex mb-6 border-b border-lavender-mist">
+                    <button class="tab-button active px-6 py-3 font-medium border-b-2 border-lavender-dream" data-upload-tab="audio">
+                        Voice Note
+                    </button>
+                    <button class="tab-button px-6 py-3 font-medium" data-upload-tab="video">
+                        Video Link
+                    </button>
+                </div>
+                
+                <!-- Audio Upload -->
+                <div id="audio-upload" class="upload-section">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-warm-grey font-medium mb-2">Recording Method</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="audio-method" value="record" checked class="mr-2">
+                                    <span>Record Now</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="audio-method" value="upload" class="mr-2">
+                                    <span>Upload File</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="record-section">
+                            <div class="bg-gentle-rose rounded-lg p-6 text-center">
+                                <div class="recording-indicator mx-auto mb-4"></div>
+                                <button id="record-button" class="bg-lavender-dream text-white px-6 py-3 rounded-full font-medium hover:bg-lavender-mist transition-colors" onclick="toggleRecording()">
+                                    Start Recording
+                                </button>
+                                <p class="text-soft-grey text-sm mt-2">Click to start recording your voice message</p>
+                            </div>
+                        </div>
+                        
+                        <div id="upload-audio-section" class="hidden">
+                            <div class="upload-area rounded-lg p-8 text-center">
+                                <svg class="w-12 h-12 text-lavender-dream mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-warm-grey mb-2">Upload audio file</p>
+                                <p class="text-soft-grey text-sm">Supports MP3, WAV, M4A up to 50MB</p>
+                                <input type="file" id="audio-input" accept="audio/*" class="hidden">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Upload -->
+                <div id="video-upload" class="upload-section hidden">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-warm-grey font-medium mb-2">Video URL</label>
+                            <input type="url" id="video-url" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Enter YouTube or Vimeo URL">
+                            <p class="text-soft-grey text-sm mt-1">Supports YouTube, Vimeo, and other popular video platforms</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Common Fields -->
+                <div class="space-y-6 mt-6">
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Your Name</label>
+                        <input type="text" id="media-author" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Enter your name" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Title</label>
+                        <input type="text" id="media-title" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Give your media a title" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Description</label>
+                        <textarea id="media-description" rows="4" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream resize-none" placeholder="Tell the story behind this media..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" onclick="closeUploadModal()" class="px-6 py-3 border border-lavender-mist rounded-lg text-warm-grey hover:bg-gentle-rose transition-colors">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="uploadMedia()" class="px-6 py-3 bg-lavender-dream text-white rounded-lg hover:bg-lavender-mist transition-colors">
+                        Share Media
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

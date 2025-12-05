@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Memories of Friends</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lavender-mist': '#E6E6FA',
+                        'lavender-dream': '#D8BFD8',
+                        'soft-grey': '#A9A9A9',
+                        'warm-grey': '#808080',
+                        'gentle-rose': '#F5F5F5'
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #E6E6FA 0%, #F5F5F5 100%);
+            min-height: 100vh;
+        }
+        
+        .photo-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .photo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #D8BFD8;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .upload-area {
+            border: 2px dashed #D8BFD8;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area.dragover {
+            border-color: #A9A9A9;
+            background-color: #F5F5F5;
+        }
+        
+        .lightbox {
+            backdrop-filter: blur(8px);
+        }
+        
+        .lightbox-content {
+            max-height: 90vh;
+            max-width: 90vw;
+        }
+        
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 1.5rem;
+        }
+        
+        @media (min-width: 640px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-button {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button.active {
+            background-color: #D8BFD8;
+            color: white;
+        }
+    </style>
+</head>
+<body class="font-inter text-warm-grey">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-lavender-mist">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-lavender-dream rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">M</span>
+                    </div>
+                    <h1 class="font-playfair text-xl font-semibold text-warm-grey">Memories of Friends</h1>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Home</a>
+                    <a href="stories.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Stories</a>
+                    <a href="gallery.html" class="nav-link active text-warm-grey hover:text-lavender-dream font-medium">Gallery</a>
+                    <a href="media.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Media</a>
+                </div>
+                
+                <button class="md:hidden p-2 rounded-lg hover:bg-lavender-mist">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-8">
+                <h1 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-4">
+                    Photo Gallery
+                </h1>
+                <p class="text-xl text-soft-grey max-w-3xl mx-auto leading-relaxed">
+                    Upload, organize, and share precious photographs that preserve visual memories and special moments.
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="openUploadModal()" class="bg-lavender-dream text-white px-6 py-3 rounded-full font-medium hover:bg-lavender-mist transition-all duration-300 hover:shadow-lg">
+                    Upload Photos
+                </button>
+                <div class="flex items-center space-x-2">
+                    <span class="text-soft-grey">View:</span>
+                    <select id="view-select" class="border border-lavender-mist rounded-lg px-3 py-2 text-warm-grey bg-white">
+                        <option value="masonry">Masonry</option>
+                        <option value="grid">Grid</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="py-6 bg-gentle-rose">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="filter-button active px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="all">
+                    All Photos
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="family">
+                    Family
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="nature">
+                    Nature
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="celebration">
+                    Celebrations
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="memorial">
+                    Memorial
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Photo Gallery -->
+    <section class="py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div id="photo-gallery" class="masonry-grid">
+                <!-- Photo Card 1 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="memorial" onclick="openLightbox(0)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/shastone.com/738958de78ea84e024a61d8a460f0425a4443734.jpg" 
+                         alt="Memorial candles" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/853005650ed6505cb38c89ae965a2bd34952de82.jpg" 
+                                 alt="Sarah M." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Sarah M.</h4>
+                                <p class="text-xs text-soft-grey">2 hours ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Light in Remembrance</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">Lighting these candles in memory of my grandmother on the anniversary of her passing. Her light continues to guide us.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">42</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Memorial</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 2 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="nature" onclick="openLightbox(1)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/0609284a80c28f1c96dc40cd0383e3c1146f1455.jpg" 
+                         alt="Lavender field" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                                 alt="Michael R." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Michael R.</h4>
+                                <p class="text-xs text-soft-grey">5 hours ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Sunset at Lavender Fields</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">This photo reminds me of the trip we took to Provence. Mom loved lavender more than anything.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">31</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Nature</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 3 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="family" onclick="openLightbox(2)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/853005650ed6505cb38c89ae965a2bd34952de82.jpg" 
+                         alt="Gentle hands" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/b1e33e4c55e8f45518e99c86157546ea2f3ae815.jpg" 
+                                 alt="Emma L." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Emma L.</h4>
+                                <p class="text-xs text-soft-grey">1 day ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Grandmother's Hands</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">These hands that held me as a baby, taught me to cook, and wiped away my tears. Forever precious.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">67</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Family</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 4 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="nature" onclick="openLightbox(3)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                         alt="Soft roses" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/cdn.pixabay.com/ac0105d2729504c6c85067cac85714e479c89738.jpg" 
+                                 alt="Lisa K." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Lisa K.</h4>
+                                <p class="text-xs text-soft-grey">1 day ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Garden Roses</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">Roses from my mother's garden. She had the most beautiful roses in the neighborhood.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">28</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Nature</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 5 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="memorial" onclick="openLightbox(4)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/cdn.pixabay.com/ac0105d2729504c6c85067cac85714e479c89738.jpg" 
+                         alt="Water reflection" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/ebd582565e4e962423323ad18c9a93931cc8d130.jpg" 
+                                 alt="David L." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">David L.</h4>
+                                <p class="text-xs text-soft-grey">2 days ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Peaceful Waters</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">This peaceful lake reminds me of the fishing trips with my grandfather. Those were special times.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">35</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Memorial</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 6 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="celebration" onclick="openLightbox(5)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/fe70351be3ea33845d986061f720dda0af2cce2a.jpg" 
+                         alt="Morning light" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/0609284a80c28f1c96dc40cd0383e3c1146f1455.jpg" 
+                                 alt="Robert M." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Robert M.</h4>
+                                <p class="text-xs text-soft-grey">3 days ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Morning Light</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">The morning light through the trees reminds me of Easter mornings with family.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">19</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Celebration</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 7 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="nature" onclick="openLightbox(6)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/images.fineartamerica.com/27cd8e03179b4ba4c89e7abe3dc1e87257ec8a58.jpg" 
+                         alt="Mountain lake" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                                 alt="Anna P." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Anna P.</h4>
+                                <p class="text-xs text-soft-grey">4 days ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Mountain Serenity</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">This mountain lake was my father's favorite place. We scattered his ashes here last summer.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">73</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Nature</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Photo Card 8 -->
+                <div class="masonry-item photo-card bg-white rounded-2xl border border-lavender-mist overflow-hidden cursor-pointer" data-category="family" onclick="openLightbox(7)">
+                    <img src="https://kimi-web-img.moonshot.cn/img/img.freepik.com/1b67f40e0aca99bb05288d92b30400e130d83035.jpg" 
+                         alt="Garden path" class="w-full h-auto object-cover">
+                    <div class="p-4">
+                        <div class="flex items-center mb-3">
+                            <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/853005650ed6505cb38c89ae965a2bd34952de82.jpg" 
+                                 alt="Maria S." class="w-8 h-8 rounded-full object-cover mr-3">
+                            <div>
+                                <h4 class="font-semibold text-warm-grey text-sm">Maria S.</h4>
+                                <p class="text-xs text-soft-grey">5 days ago</p>
+                            </div>
+                        </div>
+                        <h3 class="font-playfair text-lg font-semibold text-warm-grey mb-2">Garden Memories</h3>
+                        <p class="text-soft-grey text-sm leading-relaxed">Walking through this garden path where I used to walk with my mother. The memories are everywhere.</p>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-4">
+                                <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                    </svg>
+                                    <span class="text-sm">41</span>
+                                </button>
+                            </div>
+                            <span class="text-xs text-soft-grey">Family</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 lightbox hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-lavender-mist">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-playfair text-2xl font-bold text-warm-grey">Upload Photos</h2>
+                    <button onclick="closeUploadModal()" class="text-soft-grey hover:text-warm-grey">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <form class="p-6" onsubmit="uploadPhotos(event)">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Upload Method</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="upload-method" value="file" checked class="mr-2">
+                                <span>From Device</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="upload-method" value="url" class="mr-2">
+                                <span>From URL</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="file-upload" class="upload-area rounded-lg p-8 text-center">
+                        <svg class="w-12 h-12 text-lavender-dream mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="text-warm-grey mb-2">Drag and drop photos here, or click to select</p>
+                        <p class="text-soft-grey text-sm">Supports JPG, PNG, GIF up to 10MB</p>
+                        <input type="file" id="photo-input" accept="image/*" multiple class="hidden">
+                    </div>
+                    
+                    <div id="url-upload" class="hidden">
+                        <label class="block text-warm-grey font-medium mb-2">Photo URL</label>
+                        <input type="url" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Enter photo URL">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Category</label>
+                        <select id="photo-category" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream">
+                            <option value="family">Family</option>
+                            <option value="nature">Nature</option>
+                            <option value="celebration">Celebration</option>
+                            <option value="memorial">Memorial</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Photo Title</label>
+                        <input type="text" id="photo-title" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Give your photo a title" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Description</label>
+                        <textarea id="photo-description" rows="4" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream resize-none" placeholder="Tell the story behind this photo..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" onclick="closeUploadModal()" class="px-6 py-3 border border-lavender-mist rounded-lg text-warm-grey hover:bg-gentle-rose transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-lavender-dream text-white rounded-lg hover:bg-lavender-mist transition-colors">
+                        Upload Photos
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 bg-black bg-opacity-90 lightbox hidden z-50 flex items-center justify-center p-4">
+        <div class="lightbox-content bg-white rounded-2xl overflow-hidden max-w-4xl w-full">
+            <div class="relative">
+                <button onclick="closeLightbox()" class="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-70">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <button onclick="previousPhoto()" class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-70">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                
+                <button onclick="nextPhoto()" class="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-black bg-opacity-50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-opacity-70">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                
+                <img id="lightbox-image" src="" alt="" class="w-full h-auto max-h-[70vh] object-contain">
+            </div>
+            
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <img id="lightbox-author-avatar" src="" alt="" class="w-12 h-12 rounded-full object-cover mr-4">
+                    <div>
+                        <h4 id="lightbox-author-name" class="font-semibold text-warm-grey"></h4>
+                        <p id="lightbox-upload-date" class="text-sm text-soft-grey"></p>
+                    </div>
+                </div>
+                
+                <h3 id="lightbox-title" class="font-playfair text-2xl font-bold text-warm-grey mb-3"></h3>
+                <p id="lightbox-description" class="text-soft-grey leading-relaxed mb-4"></p>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                            </svg>
+                            <span id="lightbox-likes">0</span>
+                        </button>
+                        <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                            </svg>
+                            <span>Share</span>
+                        </button>
+                    </div>
+                    <span id="lightbox-category" class="text-sm text-soft-grey bg-gentle-rose px-3 py-1 rounded-full"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

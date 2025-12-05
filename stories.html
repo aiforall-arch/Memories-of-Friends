@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories - Memories of Friends</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lavender-mist': '#E6E6FA',
+                        'lavender-dream': '#D8BFD8',
+                        'soft-grey': '#A9A9A9',
+                        'warm-grey': '#808080',
+                        'gentle-rose': '#F5F5F5'
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #E6E6FA 0%, #F5F5F5 100%);
+            min-height: 100vh;
+        }
+        
+        .story-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .story-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #D8BFD8;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .story-content {
+            max-height: 120px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .story-content.expanded {
+            max-height: none;
+        }
+        
+        .story-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(transparent, white);
+            pointer-events: none;
+        }
+        
+        .story-content.expanded::after {
+            display: none;
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+        }
+        
+        .like-button {
+            transition: all 0.2s ease;
+        }
+        
+        .like-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .like-button.liked {
+            color: #D8BFD8;
+        }
+        
+        .filter-button {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button.active {
+            background-color: #D8BFD8;
+            color: white;
+        }
+    </style>
+</head>
+<body class="font-inter text-warm-grey">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-lavender-mist">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-lavender-dream rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">M</span>
+                    </div>
+                    <h1 class="font-playfair text-xl font-semibold text-warm-grey">Memories of Friends</h1>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Home</a>
+                    <a href="stories.html" class="nav-link active text-warm-grey hover:text-lavender-dream font-medium">Stories</a>
+                    <a href="gallery.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Gallery</a>
+                    <a href="media.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Media</a>
+                </div>
+                
+                <button class="md:hidden p-2 rounded-lg hover:bg-lavender-mist">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="pt-24 pb-12 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-8">
+                <h1 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-4">
+                    Stories & Memories
+                </h1>
+                <p class="text-xl text-soft-grey max-w-3xl mx-auto leading-relaxed">
+                    Share your written memories, life stories, and meaningful moments that capture the essence of your loved ones.
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="openStoryModal()" class="bg-lavender-dream text-white px-6 py-3 rounded-full font-medium hover:bg-lavender-mist transition-all duration-300 hover:shadow-lg">
+                    Share Your Story
+                </button>
+                <div class="flex items-center space-x-2">
+                    <span class="text-soft-grey">Sort by:</span>
+                    <select id="sort-select" class="border border-lavender-mist rounded-lg px-3 py-2 text-warm-grey bg-white">
+                        <option value="recent">Most Recent</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="alphabetical">Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="py-6 bg-gentle-rose">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button class="filter-button active px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="all">
+                    All Stories
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="family">
+                    Family
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="friends">
+                    Friends
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="celebration">
+                    Celebrations
+                </button>
+                <button class="filter-button px-4 py-2 rounded-full border border-lavender-mist text-sm font-medium" data-filter="reflection">
+                    Reflections
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stories Grid -->
+    <section class="py-12">
+        <div class="max-w-6xl mx-auto px-6">
+            <div id="stories-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Story Card 1 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="family">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/853005650ed6505cb38c89ae965a2bd34952de82.jpg" 
+                             alt="Sarah M." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Sarah M.</h3>
+                            <p class="text-sm text-soft-grey">Grandma's Garden Wisdom</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>Every spring, I remember how Grandma taught me to plant seeds with patience and love. Her hands, weathered but gentle, showed me that growth takes time and care. She would say, "Just like people, plants need love to flourish."</p>
+                        <p>Those lessons in her garden became lessons for life. She taught me that the most beautiful flowers often take the longest to bloom, and that every weed removed makes room for something wonderful to grow.</p>
+                        <p>Now, when I tend to my own garden, I feel her presence beside me, whispering words of encouragement and wisdom that will stay with me forever.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>24</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>8</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                    
+                    <div class="comments-section mt-4 hidden">
+                        <div class="border-t border-lavender-mist pt-4">
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-start space-x-3">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/ebd582565e4e962423323ad18c9a93931cc8d130.jpg" 
+                                         alt="Commenter" class="w-8 h-8 rounded-full object-cover">
+                                    <div class="flex-1">
+                                        <div class="bg-gentle-rose rounded-lg p-3">
+                                            <p class="text-sm font-medium text-warm-grey">Emma L.</p>
+                                            <p class="text-sm text-soft-grey">This is so beautiful, Sarah. Your grandma sounds like she was an amazing woman.</p>
+                                        </div>
+                                        <p class="text-xs text-soft-grey mt-1">2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="text" placeholder="Add a comment..." class="flex-1 border border-lavender-mist rounded-lg px-3 py-2 text-sm">
+                                <button class="bg-lavender-dream text-white px-4 py-2 rounded-lg text-sm hover:bg-lavender-mist">Post</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Story Card 2 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="family">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/ebd582565e4e962423323ad18c9a93931cc8d130.jpg" 
+                             alt="James T." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">James T.</h3>
+                            <p class="text-sm text-soft-grey">Dad's Jokes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>My father had the most terrible sense of humor, but that's what made it perfect. Every Sunday morning, he would wake us up with his "joke of the day," which was usually a groan-worthy pun that had us rolling our eyes.</p>
+                        <p>"Why don't scientists trust atoms?" he would ask with a grin. "Because they make up everything!" We'd groan and laugh simultaneously, knowing that this was just the beginning of a day filled with his special brand of humor.</p>
+                        <p>Now, whenever I hear a bad joke, I can't help but smile and think of those Sunday mornings. His laughter was infectious, and his joy in the simple things taught me to find humor in everyday moments.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>31</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>12</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Story Card 3 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="friends">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                             alt="Maria R." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Maria R.</h3>
+                            <p class="text-sm text-soft-grey">Summer at the Lake</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>The summer I turned sixteen, my best friend and I spent every day at the lake. We would ride our bikes down the dusty path, towels flapping behind us like flags, racing to see who could reach the water first.</p>
+                        <p>Those days were filled with simple pleasures - the feeling of sun-warmed rocks beneath our backs, the shock of cold water on sun-kissed skin, and conversations that seemed to last forever as we floated on our backs, watching clouds drift by.</p>
+                        <p>That friend moved away the following year, but every summer when I visit that lake, I can still hear her laughter echoing across the water, reminding me of a time when friendship was as simple and pure as a summer day.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>45</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>6</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Story Card 4 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="reflection">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/b1e33e4c55e8f45518e99c86157546ea2f3ae815.jpg" 
+                             alt="David L." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">David L.</h3>
+                            <p class="text-sm text-soft-grey">The Music Teacher</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>Mrs. Chen was my piano teacher for twelve years, but she taught me far more than music. She taught me about discipline, about finding beauty in small moments, and about the power of persistence.</p>
+                        <p>Every Tuesday afternoon, I would sit beside her at the piano, struggling through scales and sonatas. When I wanted to give up, she would place her hand over mine and say, "The music is already inside you. We just need to help it find its way out."</p>
+                        <p>Years later, when I performed my first recital as a professional musician, I looked out into the audience and saw her there, tears streaming down her face. She had believed in me when I couldn't believe in myself.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>67</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>15</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Story Card 5 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="family">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/cdn.pixabay.com/ac0105d2729504c6c85067cac85714e479c89738.jpg" 
+                             alt="Lisa K." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Lisa K.</h3>
+                            <p class="text-sm text-soft-grey">Letters from Home</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>During my grandfather's time in the war, he wrote to my grandmother every single day. Fifty years later, she showed me the letters - hundreds of them, tied with ribbon and kept in a wooden box beneath her bed.</p>
+                        <p>His handwriting was rushed but careful, filled with misspelled words and crossed-out sentences. But every letter ended the same way: "Thinking of you keeps me going. Come home to me."</p>
+                        <p>Reading those letters as an adult, I understood what true love looked like. It wasn't grand gestures or perfect words - it was the commitment to stay connected, even across oceans and through the darkest times.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>89</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>23</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Story Card 6 -->
+                <article class="story-card bg-white rounded-2xl p-6 border border-lavender-mist" data-category="celebration">
+                    <div class="flex items-center mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/fe70351be3ea33845d986061f720dda0af2cce2a.jpg" 
+                             alt="Robert M." class="w-12 h-12 rounded-full object-cover mr-4">
+                        <div>
+                            <h3 class="font-semibold text-warm-grey">Robert M.</h3>
+                            <p class="text-sm text-soft-grey">The Recipe Box</p>
+                        </div>
+                    </div>
+                    
+                    <div class="story-content text-soft-grey leading-relaxed mb-4">
+                        <p>My mother kept her recipes in a worn wooden box that had belonged to her mother. Each card was stained with years of use, covered with notes and modifications in her perfect cursive handwriting.</p>
+                        <p>When she passed, I inherited the box. Going through those recipes was like reading her diary - each dish told a story about our family, about holidays and celebrations, about love expressed through food.</p>
+                        <p>Now, when I cook her famous apple pie, I feel her beside me in the kitchen. The recipe card, worn soft at the edges, connects me to generations of family tradition and the love that was stirred into every meal.</p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button flex items-center space-x-2 text-soft-grey hover:text-lavender-dream" onclick="toggleLike(this)">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                </svg>
+                                <span>52</span>
+                            </button>
+                            <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey" onclick="toggleComments(this)">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span>11</span>
+                            </button>
+                        </div>
+                        <button class="text-lavender-dream hover:text-lavender-mist text-sm font-medium" onclick="toggleStoryExpansion(this)">
+                            Read More
+                        </button>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story Submission Modal -->
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-lavender-mist">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-playfair text-2xl font-bold text-warm-grey">Share Your Story</h2>
+                    <button onclick="closeStoryModal()" class="text-soft-grey hover:text-warm-grey">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <form class="p-6" onsubmit="submitStory(event)">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Your Name</label>
+                        <input type="text" id="author-name" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Enter your name" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Story Title</label>
+                        <input type="text" id="story-title" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream" placeholder="Give your story a title" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Category</label>
+                        <select id="story-category" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream">
+                            <option value="family">Family</option>
+                            <option value="friends">Friends</option>
+                            <option value="celebration">Celebration</option>
+                            <option value="reflection">Reflection</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-warm-grey font-medium mb-2">Your Story</label>
+                        <textarea id="story-content" rows="8" class="w-full border border-lavender-mist rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lavender-dream resize-none" placeholder="Share your precious memory..." required></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" onclick="closeStoryModal()" class="px-6 py-3 border border-lavender-mist rounded-lg text-warm-grey hover:bg-gentle-rose transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-6 py-3 bg-lavender-dream text-white rounded-lg hover:bg-lavender-mist transition-colors">
+                        Share Story
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

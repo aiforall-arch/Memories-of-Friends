@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memories of Friends - Where love, laughter, and stories stay alive</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lavender-mist': '#E6E6FA',
+                        'lavender-dream': '#D8BFD8',
+                        'soft-grey': '#A9A9A9',
+                        'warm-grey': '#808080',
+                        'gentle-rose': '#F5F5F5'
+                    },
+                    fontFamily: {
+                        'playfair': ['Playfair Display', 'serif'],
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #E6E6FA 0%, #F5F5F5 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(rgba(230, 230, 250, 0.8), rgba(245, 245, 245, 0.8)), 
+                        url('resources/hero-memorial-garden.png') center/cover;
+            position: relative;
+        }
+        
+        .memory-card {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .memory-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #D8BFD8;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .memory-type-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .memory-type-card:hover .memory-type-icon {
+            transform: scale(1.1);
+        }
+        
+        .recent-memory {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .recent-memory.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+    </style>
+</head>
+<body class="font-inter text-warm-grey">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-lavender-mist">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-lavender-dream rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-semibold">M</span>
+                    </div>
+                    <h1 class="font-playfair text-xl font-semibold text-warm-grey">Memories of Friends</h1>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Home</a>
+                    <a href="stories.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Stories</a>
+                    <a href="gallery.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Gallery</a>
+                    <a href="media.html" class="nav-link text-warm-grey hover:text-lavender-dream font-medium">Media</a>
+                </div>
+                
+                <button class="md:hidden p-2 rounded-lg hover:bg-lavender-mist">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+        <div class="floating-particles" id="particles"></div>
+        
+        <div class="content-layer max-w-4xl mx-auto px-6 text-center">
+            <div class="mb-8">
+                <h1 class="font-playfair text-5xl md:text-7xl font-bold text-warm-grey mb-6 leading-tight">
+                    <span id="hero-text"></span>
+                </h1>
+                <p class="text-xl md:text-2xl text-soft-grey font-light max-w-2xl mx-auto leading-relaxed">
+                    A peaceful place to preserve and share the precious memories of those we hold dear
+                </p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <button onclick="scrollToSection('memory-types')" class="bg-lavender-dream text-white px-8 py-4 rounded-full font-medium hover:bg-lavender-mist transition-all duration-300 hover:shadow-lg">
+                    Share a Memory
+                </button>
+                <button onclick="scrollToSection('recent-memories')" class="border-2 border-lavender-dream text-lavender-dream px-8 py-4 rounded-full font-medium hover:bg-lavender-dream hover:text-white transition-all duration-300">
+                    Browse Memories
+                </button>
+            </div>
+            
+            <div class="flex items-center justify-center space-x-4 text-soft-grey">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-lavender-dream rounded-full animate-pulse"></div>
+                    <span class="text-sm">1,247 memories shared</span>
+                </div>
+                <div class="w-1 h-1 bg-soft-grey rounded-full"></div>
+                <div class="flex items-center space-x-2">
+                    <svg class="w-4 h-4 text-lavender-dream" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                    </svg>
+                    <span class="text-sm">3,891 hearts given</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Memory Types Section -->
+    <section id="memory-types" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-6">
+                    Preserve Every Precious Moment
+                </h2>
+                <p class="text-xl text-soft-grey max-w-3xl mx-auto leading-relaxed">
+                    Share your memories in the format that feels most meaningful to you. 
+                    Every story, photo, recording, and video helps keep their spirit alive.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Stories Card -->
+                <div class="memory-type-card memory-card bg-white rounded-2xl p-8 border border-lavender-mist cursor-pointer" onclick="window.location.href='stories.html'">
+                    <div class="memory-type-icon w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-playfair text-2xl font-semibold text-warm-grey mb-4 text-center">Stories</h3>
+                    <p class="text-soft-grey text-center leading-relaxed">
+                        Share written memories, life stories, and meaningful moments that capture the essence of your loved ones.
+                    </p>
+                    <div class="mt-6 text-center">
+                        <span class="text-lavender-dream font-medium">456 stories shared</span>
+                    </div>
+                </div>
+                
+                <!-- Photos Card -->
+                <div class="memory-type-card memory-card bg-white rounded-2xl p-8 border border-lavender-mist cursor-pointer" onclick="window.location.href='gallery.html'">
+                    <div class="memory-type-icon w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-playfair text-2xl font-semibold text-warm-grey mb-4 text-center">Photos</h3>
+                    <p class="text-soft-grey text-center leading-relaxed">
+                        Upload and organize precious photographs that preserve visual memories and special moments.
+                    </p>
+                    <div class="mt-6 text-center">
+                        <span class="text-lavender-dream font-medium">892 photos shared</span>
+                    </div>
+                </div>
+                
+                <!-- Audio Card -->
+                <div class="memory-type-card memory-card bg-white rounded-2xl p-8 border border-lavender-mist cursor-pointer" onclick="window.location.href='media.html'">
+                    <div class="memory-type-icon w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-playfair text-2xl font-semibold text-warm-grey mb-4 text-center">Voice Notes</h3>
+                    <p class="text-soft-grey text-center leading-relaxed">
+                        Record and share voice messages, stories, and the precious sound of remembered voices.
+                    </p>
+                    <div class="mt-6 text-center">
+                        <span class="text-lavender-dream font-medium">127 recordings shared</span>
+                    </div>
+                </div>
+                
+                <!-- Videos Card -->
+                <div class="memory-type-card memory-card bg-white rounded-2xl p-8 border border-lavender-mist cursor-pointer" onclick="window.location.href='media.html'">
+                    <div class="memory-type-icon w-16 h-16 bg-lavender-dream rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-playfair text-2xl font-semibold text-warm-grey mb-4 text-center">Videos</h3>
+                    <p class="text-soft-grey text-center leading-relaxed">
+                        Share video tributes, recorded messages, and precious moments captured in motion.
+                    </p>
+                    <div class="mt-6 text-center">
+                        <span class="text-lavender-dream font-medium">73 videos shared</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Memories Carousel -->
+    <section id="recent-memories" class="py-20 bg-gentle-rose">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-6">
+                    Recently Shared Memories
+                </h2>
+                <p class="text-xl text-soft-grey max-w-3xl mx-auto leading-relaxed">
+                    Join our community in celebrating the lives and memories of those who have touched our hearts.
+                </p>
+            </div>
+            
+            <div class="splide" id="memory-carousel">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        <li class="splide__slide">
+                            <div class="recent-memory bg-white rounded-2xl p-6 border border-lavender-mist h-full">
+                                <div class="flex items-center mb-4">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/853005650ed6505cb38c89ae965a2bd34952de82.jpg" 
+                                         alt="Gentle hands" class="w-12 h-12 rounded-full object-cover mr-4">
+                                    <div>
+                                        <h4 class="font-semibold text-warm-grey">Sarah M.</h4>
+                                        <p class="text-sm text-soft-grey">2 hours ago</p>
+                                    </div>
+                                </div>
+                                <h3 class="font-playfair text-xl font-semibold text-warm-grey mb-3">Grandma's Garden Wisdom</h3>
+                                <p class="text-soft-grey leading-relaxed mb-4">
+                                    Every spring, I remember how Grandma taught me to plant seeds with patience and love. 
+                                    Her hands, weathered but gentle, showed me that growth takes time...
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                            </svg>
+                                            <span class="text-sm">24</span>
+                                        </button>
+                                        <button class="flex items-center space-x-2 text-soft-grey hover:text-warm-grey">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            <span class="text-sm">8</span>
+                                        </button>
+                                    </div>
+                                    <span class="text-xs text-soft-grey">Story</span>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="recent-memory bg-white rounded-2xl p-6 border border-lavender-mist h-full">
+                                <div class="aspect-w-16 aspect-h-12 mb-4">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/media.istockphoto.com/0609284a80c28f1c96dc40cd0383e3c1146f1455.jpg" 
+                                         alt="Lavender field" class="w-full h-48 object-cover rounded-lg">
+                                </div>
+                                <div class="flex items-center mb-3">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/petaldriven.com/3e833abd85621bb4800faadc2f7345b89aa52528.jpg" 
+                                         alt="Roses" class="w-10 h-10 rounded-full object-cover mr-3">
+                                    <div>
+                                        <h4 class="font-semibold text-warm-grey">Michael R.</h4>
+                                        <p class="text-sm text-soft-grey">5 hours ago</p>
+                                    </div>
+                                </div>
+                                <h3 class="font-playfair text-xl font-semibold text-warm-grey mb-2">Sunset at Lavender Fields</h3>
+                                <p class="text-soft-grey text-sm leading-relaxed">
+                                    This photo reminds me of the trip we took to Provence. Mom loved lavender more than anything...
+                                </p>
+                                <div class="flex items-center justify-between mt-4">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                            </svg>
+                                            <span class="text-sm">31</span>
+                                        </button>
+                                    </div>
+                                    <span class="text-xs text-soft-grey">Photo</span>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="recent-memory bg-white rounded-2xl p-6 border border-lavender-mist h-full">
+                                <div class="flex items-center mb-4">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/images.stockcake.com/b1e33e4c55e8f45518e99c86157546ea2f3ae815.jpg" 
+                                         alt="Dove" class="w-12 h-12 rounded-full object-cover mr-4">
+                                    <div>
+                                        <h4 class="font-semibold text-warm-grey">Emma L.</h4>
+                                        <p class="text-sm text-soft-grey">1 day ago</p>
+                                    </div>
+                                </div>
+                                <h3 class="font-playfair text-xl font-semibold text-warm-grey mb-3">Dad's Favorite Song</h3>
+                                <div class="bg-gentle-rose rounded-lg p-4 mb-4">
+                                    <div class="flex items-center space-x-3">
+                                        <button class="w-10 h-10 bg-lavender-dream rounded-full flex items-center justify-center hover:bg-lavender-mist">
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M8 5v10l7-5z"></path>
+                                            </svg>
+                                        </button>
+                                        <div class="flex-1">
+                                            <div class="h-2 bg-white rounded-full overflow-hidden">
+                                                <div class="h-full bg-lavender-dream" style="width: 35%"></div>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-1">
+                                                <span class="text-xs text-soft-grey">2:15</span>
+                                                <span class="text-xs text-soft-grey">4:32</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-soft-grey text-sm leading-relaxed">
+                                    This recording of Dad singing his favorite song always brings tears to my eyes...
+                                </p>
+                                <div class="flex items-center justify-between mt-4">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                            </svg>
+                                            <span class="text-sm">18</span>
+                                        </button>
+                                    </div>
+                                    <span class="text-xs text-soft-grey">Audio</span>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="recent-memory bg-white rounded-2xl p-6 border border-lavender-mist h-full">
+                                <div class="aspect-w-16 aspect-h-12 mb-4">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/shastone.com/738958de78ea84e024a61d8a460f0425a4443734.jpg" 
+                                         alt="Memorial candles" class="w-full h-48 object-cover rounded-lg">
+                                </div>
+                                <div class="flex items-center mb-3">
+                                    <img src="https://kimi-web-img.moonshot.cn/img/cdn.pixabay.com/ac0105d2729504c6c85067cac85714e479c89738.jpg" 
+                                         alt="Water reflection" class="w-10 h-10 rounded-full object-cover mr-3">
+                                    <div>
+                                        <h4 class="font-semibold text-warm-grey">David K.</h4>
+                                        <p class="text-sm text-soft-grey">2 days ago</p>
+                                    </div>
+                                </div>
+                                <h3 class="font-playfair text-xl font-semibold text-warm-grey mb-2">Light in the Darkness</h3>
+                                <p class="text-soft-grey text-sm leading-relaxed">
+                                    Lighting these candles in memory of my sister on the anniversary of her passing...
+                                </p>
+                                <div class="flex items-center justify-between mt-4">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="flex items-center space-x-2 text-lavender-dream hover:text-lavender-mist">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path>
+                                            </svg>
+                                            <span class="text-sm">42</span>
+                                        </button>
+                                    </div>
+                                    <span class="text-xs text-soft-grey">Photo</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="font-playfair text-4xl md:text-5xl font-bold text-warm-grey mb-6">
+                Every Memory Matters
+            </h2>
+            <p class="text-xl text-soft-grey mb-12 leading-relaxed">
+                Your stories, photos, and recordings help create a lasting legacy. 
+                Start preserving precious memories today.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="window.location.href='stories.html'" class="bg-lavender-dream text-white px-8 py-4 rounded-full font-medium hover:bg-lavender-mist transition-all duration-300 hover:shadow-lg">
+                    Share Your First Memory
+                </button>
+                <button onclick="window.location.href='gallery.html'" class="border-2 border-lavender-dream text-lavender-dream px-8 py-4 rounded-full font-medium hover:bg-lavender-dream hover:text-white transition-all duration-300">
+                    Browse the Gallery
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-warm-grey text-white py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <div class="w-8 h-8 bg-lavender-dream rounded-full flex items-center justify-center">
+                    <span class="text-white text-sm font-semibold">M</span>
+                </div>
+                <h3 class="font-playfair text-xl font-semibold">Memories of Friends</h3>
+            </div>
+            <p class="text-soft-grey mb-6 max-w-2xl mx-auto leading-relaxed">
+                A gentle place to preserve and share the precious memories of those we hold dear. 
+                Where love, laughter, and stories stay alive forever.
+            </p>
+            <div class="border-t border-soft-grey pt-6">
+                <p class="text-sm text-soft-grey">
+                    © 2024 Memories of Friends. Created with love and remembrance.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
